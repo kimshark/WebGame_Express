@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 2. 미들웨어 설정
+// 2. 미들웨어 설정 (JSON 및 유니티 WWWForm 모두 해석 가능)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -35,15 +35,32 @@ app.get('/api/leaderboard', (req, res) => {
   });
 });
 
+// 🚀 [CSI 과학수사 존] 점수 등록 API 블랙박스 보강
 app.post('/api/leaderboard', (req, res) => {
+  console.log('--------------------------------------------------');
+  console.log('📥 [🚨 알림] 유니티로부터 점수 등록 요청이 들어왔습니다!');
+  console.log('📦 서버가 수신한 원래 데이터(req.body):', req.body);
+  console.log('--------------------------------------------------');
+
   const { name, score } = req.body;
+  
+  // 데이터 검증 실패 시 로그 상세 출력
   if (!name || score === undefined) {
-    return res.status(400).json({ success: false, message: '이름과 점수가 누락되었습니다.' });
+    console.log('❌ [유효성 검사 실패] name 또는 score 누락됨!');
+    console.log(`-> name 상태: ${name}, score 상태: ${score}`);
+    return res.status(400).json({ 
+      success: false, 
+      message: '이름과 점수가 누락되었습니다.',
+      received: req.body 
+    });
   }
+
   db.run('INSERT INTO leaderboard (name, score) VALUES (?, ?)', [name, score], function(err) {
     if (err) {
+      console.log('❌ [DB 저장 에러]:', err.message);
       return res.status(500).json({ success: false, error: err.message });
     }
+    console.log(`🏆 [DB 저장 성공] 이름: ${name} | 점수: ${score} (ID: ${this.lastID})`);
     res.json({ success: true, id: this.lastID });
   });
 });
@@ -65,15 +82,11 @@ app.post('/api/leaderboard/reset', (req, res) => {
 // 5. 리액트 빌드 파일(dist) 정적 서빙 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
-// 6. [★무한 루프 방지 치트키] Express 5 라우트 가드 설정
+// 6. 무한 루프 방지용 가드 문법
 app.get(/^\/.*$/, (req, res) => {
-  // 💡 핵심: 요청한 주소에 .js, .wasm, .data 같은 파일 확장자가 붙어있다면?
-  // 정적 파일 폴더에 진짜로 그 파일이 없어서 여기까지 내려온 것이므로, index.html을 주지 말고 솔직하게 404를 뱉어라!
   if (path.extname(req.path)) {
     return res.status(404).send(`🚫 파일 실종 상태: ${req.path}`);
   }
-  
-  // 일반적인 페이지 이동 요청만 리액트 index.html로 연결해줍니다.
   res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
 });
 
