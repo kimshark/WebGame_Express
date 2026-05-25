@@ -1,119 +1,83 @@
 const express = require('express');
-const cors = require('cors');
-const sqlite3 = require('sqlite3');
-const { open } = require('sqlite');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
-// 1. API 라우트들을 먼저 작성 (예시)
-app.get('/api/leaderboard', (req, res) => {
-  // 랭킹 불러오는 코드...
+// 1. Express 앱 초기화 (가장 먼저 실행되어야 에러가 안 납니다!)
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// 2. 미들웨어 설정 (프론트엔드에서 보내는 JSON 데이터 해석)
+app.use(express.json());
+
+// 3. SQLite 데이터베이스 연결 및 테이블 자동 생성
+const dbPath = path.join(__dirname, 'database.sqlite');
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('❌ SQLite DB 연결 실패:', err.message);
+  } else {
+    console.log('📦 database.sqlite 연결 성공!');
+    // 테이블이 없다면 최고 점수 순으로 정렬할 테이블 생성
+    db.run(`CREATE TABLE IF NOT EXISTS leaderboard (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      score INTEGER NOT NULL
+    )`);
+  }
 });
 
-// 2. [★초중요] 리액트 빌드 폴더(dist)를 static으로 등록 (이게 상단에 있어야 자바스크립트를 잘 읽습니다)
+// 4. API 라우트 영역 (반드시 정적 파일 서빙보다 위에 있어야 합니다)
+
+// [GET] 실시간 랭킹 Top 10 가져오기
+app.get('/api/leaderboard', (req, res) => {
+  db.all('SELECT name, score FROM leaderboard ORDER BY score DESC LIMIT 10', [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+// [POST] 유니티 게임 종료 시 점수 등록하기
+app.post('/api/leaderboard', (req, res) => {
+  const { name, score } = req.body;
+  if (!name || score === undefined) {
+    return res.status(400).json({ success: false, message: '이름과 점수가 누락되었습니다.' });
+  }
+
+  db.run('INSERT INTO leaderboard (name, score) VALUES (?, ?)', [name, score], function(err) {
+    if (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+    res.json({ success: true, id: this.lastID });
+  });
+});
+
+// [POST] 관리자용 리더보드 초기화 (비밀번호 검증)
+app.post('/api/leaderboard/reset', (req, res) => {
+  const { password } = req.body;
+  
+  // 💡 원하시는 비밀번호로 자유롭게 변경하세요!
+  if (password === 'admin1234') { 
+    db.run('DELETE FROM leaderboard', [], (err) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: '초기화 중 오류 발생' });
+      }
+      res.json({ success: true, message: '🏆 리더보드가 깔끔하게 초기화되었습니다!' });
+    });
+  } else {
+    res.status(401).json({ success: false, message: '❌ 비밀번호가 올바르지 않습니다.' });
+  }
+});
+
+// 5. 리액트 빌드 파일(dist) 정적 서빙 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
-// 3. [★초중요] 맨 마지막에! 위에서 걸러지지 않은 모든 주소(*)는 리액트 index.html로 몰아주기
+// 6. [Catch-All] 주소가 일치하지 않는 모든 요청은 리액트 화면으로 토스
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
 });
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// 🔒 관리자용 비밀번호 설정
-const ADMIN_PASSWORD = "admin1234";
-
-// 📦 기본 미들웨어 세팅
-app.use(cors());
-app.use(express.json());
-// 📡 [CSI 탐지기] 서버로 들어오는 모든 전화를 터미널에 실시간으로 중계합니다!
-app.use((req, res, next) => {
-  console.log(`📡 [요청 감지] 메서드: ${req.method} | 주소: ${req.url}`);
-  next();
-});
-app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
-
-let db;
-
-// 💾 데이터베이스 파일 연결 및 테이블 초기화
-async function initializeDatabase() {
-  db = await open({
-    filename: './database.sqlite',
-    driver: sqlite3.Database
-  });
-
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS leaderboard (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
-      score INTEGER,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  console.log("💾 [DB 성공] SQLite 데이터베이스 파일이 안전하게 연결되었습니다.");
-}
-
-initializeDatabase().catch(err => {
-  console.error("❌ DB 초기화 실패:", err);
-});
-
-// 📭 1. 연결 테스트용 API 주소
-app.get('/api/hello', (req, res) => {
-  res.json({ message: "연결 성공!" });
-});
-
-// 🏆 2. 리액트에게 최신 랭킹 목록 보내주기
-app.get('/api/leaderboard', async (req, res) => {
-  try {
-    const topScores = await db.all(
-      'SELECT name, score FROM leaderboard ORDER BY score DESC LIMIT 5'
-    );
-    res.json(topScores);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 🎰 3. 유저의 진짜 이름과 점수를 DB 금고에 영구 기록하기
-app.post('/api/leaderboard', async (req, res) => {
-  const { name, score } = req.body;
-  const userName = name || 'Guest';
-
-  try {
-    await db.run(
-      'INSERT INTO leaderboard (name, score) VALUES (?, ?)',
-      [userName, Number(score)]
-    );
-    console.log(`🎰 [DB 저장 완료] ID: ${userName}, 점수: ${score}점`);
-    res.json({ success: true, message: "DB에 점수가 안전하게 기록되었습니다!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 🗑 {추가됨} 4. 비밀번호 인증 후 DB 내역 완전히 지우기
-app.post('/api/leaderboard/reset', async (req, res) => {
-  const { password } = req.body;
-
-  if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, message: "비밀번호가 일치하지 않습니다!" });
-  }
-
-  try {
-    await db.run('DELETE FROM leaderboard');
-    console.log("🗑️ [DB 초기화 완료] 관리자 인증에 의해 모든 랭킹 기록이 완전히 삭제되었습니다.");
-    res.json({ success: true, message: "모든 랭킹 기록이 완벽하게 초기화되었습니다!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 🚀 ★ 초중요: 리액트 화면 전달 미들웨어는 반드시 모든 API(/api/...)들보다 맨 아래에 있어야 합니다!
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
-});
-
-// 🖥️ 서버 시동
+// 7. 서버 기동
 app.listen(PORT, () => {
   console.log(`🚀 백엔드 매니저가 ${PORT}번 포트에서 출근 완료했습니다!`);
 });
