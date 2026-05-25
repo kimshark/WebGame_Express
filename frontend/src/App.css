@@ -68,7 +68,7 @@ body {
   box-sizing: border-box;
 }
 
-/* 글래스모피즘 판넬 */
+/* 글래스모피즘 판ネル */
 .glass-panel {
   width: 100%;
   background: rgba(17, 24, 39, 0.7);
@@ -104,7 +104,7 @@ body {
   gap: 15px;
 }
 
-/* 🎮 유니티 기본 정적 액자 상자 (PC) */
+/* 🎮 유니티 기본 정적 액자 상자 (PC 기본) */
 .game-wrapper {
   width: 100%;
   overflow: hidden;
@@ -141,7 +141,7 @@ body {
 .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #d1d5db; }
 .btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
 
-/* 모바일 전용 스위치 기본 숨김 */
+/* 모바일 전용 스위치 (미디어쿼리에서 활성화) */
 .mobile-fs-btn { display: none; }
 
 /* 🏆 리더보드 데이터 스타일 */
@@ -160,64 +160,56 @@ body {
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
 
 
-/* 🚀📱 [★85% 안전구역 마스터 패치] 모바일 가로 강제 전체화면 스마트 반응형 쿼리 */
+/* ========================================================================== */
+/* 🚀 [★무적의 전천후 풀스크린 패치] 미디어 쿼리 타파, 85% 무조건 강제 집행 존 */
+/* ========================================================================== */
+
+/* ❶ 스마트폰이 [물리 가로] 상태이거나, PC 브라우저에서 버튼을 눌렀을 때 (기본 가로 베이스 정렬) */
+.game-wrapper.mobile-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  border-radius: 0 !important;
+  background: #000000 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transform: none !important; /* 가로 상태이므로 회전 안 함 */
+}
+
+.game-wrapper.mobile-fullscreen .game-canvas {
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: 16 / 10.4 !important;
+  
+  /* 💡 가로 폰 화면 너비/높이의 정확히 85%로 강제 구속 (드디어 가로 모드 대폭 축소 발동!) */
+  max-width: 85vw !important;  
+  max-height: 85vh !important; 
+}
+
+/* ❷ 스마트폰을 [세로]로 든 상태에서 버튼을 눌렀을 때만 90도 중력 회전 매직 추가 가동 */
+@media (max-width: 768px) and (orientation: portrait) {
+  .game-wrapper.mobile-fullscreen {
+    top: 50% !important;
+    left: 50% !important;
+    width: 100vh !important; /* 회전 상태에 맞게 화면 상하좌우 크기 역전 주입 */
+    height: 100vw !important; 
+    transform: translate(-50%, -50%) rotate(90deg) !important; /* 세로 폰 화면에서 강제 가로 눕히기 */
+  }
+  .game-wrapper.mobile-fullscreen .game-canvas {
+    /* 역전된 부모 상자 크기(100vh, 100vw) 기준의 정확히 85%로 미니멀 축소 */
+    max-width: 85% !important;         
+    max-height: 85% !important;        
+  }
+}
+
+/* 일반 모바일 레이아웃 보정용 미디어쿼리 (전체화면 버튼 노출용) */
 @media (max-width: 768px) {
   .app-header { padding: 15px; }
   .main-content { padding: 0 10px 40px 10px; gap: 15px; }
   .glass-panel { padding: 16px; }
-  .mobile-fs-btn { display: inline-block; } 
-
-  /* ❶ 스마트폰을 [세로]로 들고 있을 때 버튼을 누른 경우 -> 게임만 90도 강제 회전 */
-  @media (orientation: portrait) {
-    .game-wrapper.mobile-fullscreen {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      width: 100vh; 
-      height: 100vw; 
-      transform: translate(-50%, -50%) rotate(90deg); 
-      z-index: 999999 !important;
-      border-radius: 0;
-      background: #000000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .game-wrapper.mobile-fullscreen .game-canvas {
-      width: auto;
-      height: auto;
-      aspect-ratio: 16 / 10.4;  
-      
-      /* 💡 [★대폭 수정] 풀스크린 크기의 정확히 85%로 축소하여 사방 여백 확보 (노치 짤림 원천 차단) */
-      max-width: 85%;         
-      max-height: 85%;        
-    }
-  }
-
-  /* ❷ 스마트폰을 물리적으로 [가로]로 돌려서 누른 경우 -> 회전 없이 풀스크린 매칭 */
-  @media (orientation: landscape) {
-    .game-wrapper.mobile-fullscreen {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw;
-      height: 100vh;
-      transform: none !important;
-      z-index: 999999 !important;
-      border-radius: 0;
-      background: #000000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .game-wrapper.mobile-fullscreen .game-canvas {
-      width: auto;
-      height: auto;
-      aspect-ratio: 16 / 10.4;
-      
-      /* 💡 [★대폭 수정] 물리 가로 모드에서도 정확히 화면의 85% 크기로 안전하게 팝업 */
-      max-width: 85%;         
-      max-height: 85%;        
-    }
-  }
+  .mobile-fs-btn { display: inline-block !important; } 
 }
