@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-// 1. Express 앱 초기화
+// 1. Express 앱 초기화 (최상단 위치 필수)
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -70,13 +70,13 @@ app.post('/api/leaderboard/reset', (req, res) => {
 // 5. 리액트 빌드 파일(dist) 정적 서빙 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
-// 6. [★Express 5 필수 수정] 주소가 일치하지 않는 모든 요청을 리액트로 토스
-// {*splat} 문법을 통해 메인 루트(/)와 하위 주소 전체를 에러 없이 안전하게 잡아냅니다.
-app.get('/{*splat}', (req, res) => {
+// 6. [★Express 5 공식 안전 문법] 정적 파일이 아닌 모든 일반 페이지 요청만 리액트로 토스
+// 정규식 리터럴( /^\/.*$/ )을 사용하여 Express 5의 문자열 파싱 에러를 완벽하게 우회합니다.
+app.get(/^\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
 });
 
 // 7. 서버 기동
 app.listen(PORT, () => {
-  console.log(`🚀 백엔드 매니저가 ${PORT}번 포트에서 출근 완료했습니다!`);
+  console.log('🚀 백엔드 매니저가 출근 완료했습니다!');
 });
