@@ -1,0 +1,10 @@
+node_modules/
+frontend/node_modules/
+database.sqlite
+.env
+
+Library/
+Temp/
+Logs/
+UserSettings/
+Obj/
