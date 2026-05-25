@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './App.css'; // 🚀 [★범인 검거] 제 실수로 빠졌던 스타일 연결선을 다시 든든하게 연결했습니다!
 
 function App() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [isMobileFS, setIsMobileFS] = useState(false);
-  // ⌨️ 모바일 키보드 해결을 위한 리액트 이름 상태 (기본값: 모바일랭커)
   const [reactPlayerName, setReactPlayerName] = useState('모바일랭커');
   
-  // 유니티 전역 함수가 리액트의 최신 이름 상태를 실시간으로 참조할 수 있도록 Ref 사용
   const nameRef = useRef(reactPlayerName);
 
   useEffect(() => {
@@ -42,19 +41,18 @@ function App() {
   useEffect(() => {
     fetchLeaderboard();
 
-    // 🚀 [★핵심 패치] 유니티가 점수를 보낼 때, 리액트 입력창의 이름을 가로채서 서버로 전송
+    // 유니티 점수 수신 안테나
     window.SendScoreToReact = function (param1, param2) {
       let finalName = nameRef.current || '무명랭커';
       let finalScore = 0;
 
-      // 인자 값 판별 (유니티 빌드 구조에 맞춤)
       if (param2 !== undefined) {
         finalScore = Number(param2);
       } else {
         finalScore = Number(param1);
       }
 
-      console.log(`📡 [모바일 패치 가동] 이름: ${finalName} | 점수: ${finalScore} -> 서버 전송 시작`);
+      console.log(`📡 [모바일 패치] 이름: ${finalName} | 점수: ${finalScore} -> 서버 전송`);
 
       fetch('/api/leaderboard', {
         method: 'POST',
@@ -64,7 +62,7 @@ function App() {
         .then((res) => res.json())
         .then((data) => {
           console.log('✅ 랭킹 등록 성공:', data);
-          fetchLeaderboard(); // 등록 후 리더보드 즉시 새로고침
+          fetchLeaderboard();
         })
         .catch((err) => console.error('❌ 랭킹 전송 실패:', err));
     };
@@ -80,7 +78,7 @@ function App() {
         </div>
       </header>
 
-      {/* 메인 콘텐츠 (위아래 세로 직렬 배치) */}
+      {/* 메인 콘텐츠 */}
       <main className="main-content">
         
         {/* 🎮 1층: 플레이 존 판넬 */}
@@ -89,7 +87,7 @@ function App() {
             <h2 className="panel-title">🎮 PLAY ZONE</h2>
             <div className="controls-group">
               
-              {/* ⌨️ 모바일 전용 이름 입력창 (터치 시 키보드가 무조건 정상 작동합니다) */}
+              {/* 모바일 우회 입력창 */}
               <div className="react-input-box">
                 <label>📝 랭킹 등록 이름 :</label>
                 <input 
@@ -101,7 +99,7 @@ function App() {
                 />
               </div>
 
-              {/* 📱 모바일 화면 전환 버튼 */}
+              {/* 모바일 화면 전환 버튼 */}
               <button 
                 className="btn btn-primary mobile-fs-btn"
                 onClick={() => setIsMobileFS(!isMobileFS)}
@@ -123,7 +121,7 @@ function App() {
           </div>
         </section>
 
-        {/* 🏆 2층: 리더보드 판넬 (가로로 꽉 차게 확장) */}
+        {/* 🏆 2층: 리더보드 판넬 */}
         <section className="glass-panel">
           <div className="panel-header">
             <h2 className="panel-title">🏆 LEADERBOARD</h2>
