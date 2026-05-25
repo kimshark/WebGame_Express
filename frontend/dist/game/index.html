@@ -11,8 +11,51 @@
     
     <script src="Build/MyGameBuild.loader.js"></script>
     <script>
+      // 🚀 [★점수 연동 마스터 패치] 유니티가 외치는 SendScoreToReact 전용 안테나 설치
+      window.SendScoreToReact = function(param1, param2) {
+        console.log("🎮 유니티가 브라우저 안테나를 흔들었습니다:", param1, param2);
+        
+        let name = "Player";
+        let score = 0;
+
+        // case 1: 유니티가 (이름, 점수) 두 개를 순서대로 던졌을 때
+        if (param2 !== undefined) {
+          name = String(param1);
+          score = Number(param2);
+        } else {
+          // case 2: 점수만 던졌거나 JSON 문자열로 뭉뚱그려 던졌을 때의 예외 처리
+          if (isNaN(param1)) {
+            try {
+              const data = JSON.parse(param1);
+              name = data.name || "Player";
+              score = data.score || 0;
+            } catch(e) {
+              name = String(param1);
+            }
+          } else {
+            score = Number(param1);
+          }
+        }
+
+        console.log(`📡 매칭 완료! 백엔드로 발사합니다 -> 이름: ${name}, 점수: ${score}`);
+
+        // 🎯 우리 Express 백엔드 서버의 점수 저장 API로 직접 POST 요청 발사!
+        fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: name, score: score })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('✅ 백엔드 장부에 점수 등록 완료:', data);
+        })
+        .catch(error => console.error('❌ 백엔드 전송 실패:', error));
+      };
+
+      // 모바일 기기 감지 스타일 코드
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
