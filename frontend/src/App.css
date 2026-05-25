@@ -1,206 +1,172 @@
-/* 기본 초기화 및 고급스러운 어두운 배경 */
-:root {
-  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-  --panel-bg: rgba(30, 41, 59, 0.7);
-  --border-color: rgba(99, 102, 241, 0.2);
-  --neon-cyan: #06b6d4;
-  --neon-purple: #a855f7;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-}
-
+/* 글로벌 스타일 초기화 */
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: var(--bg-gradient);
-  color: var(--text-main);
+  background: #0b0f19;
+  color: #f3f4f6;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* 메인 레이아웃: 반응형 앱 컨테이너 */
+/* 전체 앱 컨테이너 */
 .app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
-/* 헤더 디자인 */
+/* 상단 헤더 영역 */
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  width: 100%;
+  max-width: 1000px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .app-logo {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 800;
-  letter-spacing: -0.05em;
-  background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+  letter-spacing: 2px;
+  background: linear-gradient(45deg, #4f46e5, #06b6d4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  margin: 0;
 }
 
-/* 반응형 그리드: 모바일은 1열, PC는 2열 */
+/* 🚀 [디자인 핵심] 메인 콘텐츠 영역: 가로 정렬에서 세로(Column) 정렬로 완전히 변경 */
 .main-content {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 1024px) {
-  .main-content {
-    grid-template-columns: 1.4fr 0.9fr;
-    align-items: start;
-  }
-}
-
-/* 프리미엄 유리창 효과 (Glassmorphism) */
-.glass-panel {
-  background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* 유니티 게임 뷰포트 반응형 최적화 */
-.game-wrapper {
-  position: relative;
+  display: flex;
+  flex-direction: column; 
+  gap: 25px;
   width: 100%;
-  aspect-ratio: 16 / 9; /* 유니티 가로세로 비율 유지 */
+  max-width: 1000px; /* 화면이 너무 퍼지지 않게 잡아주는 최적의 대시보드 너비 */
+  padding: 0 20px 50px 20px;
+  box-sizing: border-box;
+}
+
+/* 네온 클래스모피즘 판넬 (위아래 둘 다 가로 100% 채우기) */
+.glass-panel {
+  width: 100%;
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.game-canvas {
-  width: 100% !important;
-  height: 100% !important;
-  border: none;
-}
-
-/* 리더보드 타이틀 및 버튼 레이아웃 */
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
 }
 
 .panel-title {
   font-size: 1.25rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  letter-spacing: 1px;
+  color: #e5e7eb;
+  margin: 0;
 }
 
+/* 🎮 유니티 게임 감싸는 상자 (스크롤 바 완전 박멸 존) */
+.game-wrapper {
+  width: 100%;
+  overflow: hidden; /* 내부 스크롤바가 튀어나오는 것을 방지 */
+  border-radius: 12px;
+  background: #000000;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🎮 유니티 iframe 자체 스타일 지동 제어 */
+.game-canvas {
+  width: 100%;
+  height: 620px; /* 유니티 WebGL 기본 해상도가 깨지거나 찌그러지지 않는 가장 완벽한 고정 높이 */
+  border: none;
+  display: block;
+  overflow: hidden; /* 브라우저 강제 스크롤바 히든 */
+}
+
+/* 🏆 리더보드 테이블 디자인 정비 (가로 꽉 차게) */
 .btn-group {
   display: flex;
-  gap: 0.5rem;
+  gap: 10px;
 }
 
-/* 모던 앱 스타일 버튼 */
 .btn {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
   font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
   border: none;
+  border-radius: 8px;
+  cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 6px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--neon-cyan) 0%, #0284c7 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+  background: #4f46e5;
+  color: #ffffff;
 }
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
-}
+.btn-primary:hover { background: #4338ca; }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
+  color: #d1d5db;
+}
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
-/* 테이블 디자인 리팩토링 */
 .leaderboard-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 0.5rem;
-}
-
-.leaderboard-table th {
-  padding: 0.75rem 1rem;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  border-collapse: collapse;
   text-align: left;
 }
 
+.leaderboard-table th, 
 .leaderboard-table td {
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 14px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.leaderboard-table tr td:first-child {
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-  font-weight: 700;
-  text-align: center;
-  width: 50px;
+.leaderboard-table th {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
 }
-
-.leaderboard-table tr td:last-child {
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-/* 랭킹 1, 2, 3등 하이라이트 배지 */
-.rank-1 { color: #f59e0b; background: rgba(245, 158, 11, 0.1) !important; }
-.rank-2 { color: #94a3b8; background: rgba(148, 163, 184, 0.1) !important; }
-.rank-3 { color: #b45309; background: rgba(180, 83, 9, 0.1) !important; }
 
 .score-text {
-  font-weight: 700;
-  color: var(--neon-cyan);
   text-align: right;
+  font-weight: 700;
+  color: #06b6d4;
 }
 
-/* 데이터 없음 처리 */
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  padding: 40px 0;
+  color: #6b7280;
 }
+
+/* 순위별 명예의 전당 컬러 포인트 */
+.rank-1 { color: #f59e0b; font-weight: 800; text-align: center; }
+.rank-2 { color: #9ca3af; font-weight: 800; text-align: center; }
+.rank-3 { color: #b45309; font-weight: 800; text-align: center; }

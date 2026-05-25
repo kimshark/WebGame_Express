@@ -71,6 +71,7 @@ function App() {
               title="Unity Game" 
               className="game-canvas"
               allow="autoplay; fullscreen"
+              scrolling="no" /* 👈 웹브라우저에게 스크롤바를 절대 만들지 말라고 쐐기를 박는 속성 */
             />
           </div>
         </section>
