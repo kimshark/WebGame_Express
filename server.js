@@ -5,7 +5,7 @@ const { open } = require('sqlite');
 const path = require('path');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // 🔒 관리자용 비밀번호 설정
 const ADMIN_PASSWORD = "admin1234";
