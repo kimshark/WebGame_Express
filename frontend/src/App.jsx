@@ -65,9 +65,9 @@ function App() {
             <h2 className="panel-title">🎮 PLAY ZONE</h2>
           </div>
           <div className="game-wrapper">
-            {/* 기존 유니티 연동 iframe 코드 유지 */}
+            {/* 💡 유니티 게임 파일들이 위치한 /game/index.html 주소로 정확히 지정했습니다. */}
             <iframe 
-              src="/index.html" 
+              src="/game/index.html" 
               title="Unity Game" 
               className="game-canvas"
               allow="autoplay; fullscreen"
