@@ -4,6 +4,19 @@ const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const path = require('path');
 
+// 1. API 라우트들을 먼저 작성 (예시)
+app.get('/api/leaderboard', (req, res) => {
+  // 랭킹 불러오는 코드...
+});
+
+// 2. [★초중요] 리액트 빌드 폴더(dist)를 static으로 등록 (이게 상단에 있어야 자바스크립트를 잘 읽습니다)
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
+// 3. [★초중요] 맨 마지막에! 위에서 걸러지지 않은 모든 주소(*)는 리액트 index.html로 몰아주기
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
+});
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
