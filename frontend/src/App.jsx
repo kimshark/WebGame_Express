@@ -5,7 +5,7 @@ function App() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [isMobileFS, setIsMobileFS] = useState(false);
 
-  // 1. 실시간 랭킹 가져오기
+  // 1. 실시간 랭킹 가져오기 함수
   const fetchLeaderboard = () => {
     fetch('/api/leaderboard')
       .then((res) => res.json())
@@ -13,7 +13,7 @@ function App() {
       .catch((err) => console.error('❌ 랭킹 로딩 실패:', err));
   };
 
-  // 2. 관리자용 리더보드 초기화
+  // 2. 관리자용 리더보드 초기화 함수
   const handleReset = () => {
     const password = prompt('🔑 초기화 비밀번호를 입력하세요:');
     if (!password) return;
@@ -31,10 +31,45 @@ function App() {
       .catch((err) => console.error('❌ 초기화 실패:', err));
   };
 
-  useEffect(() => {
-    fetchLeaderboard();
+  // 3. 모바일 가로 강제 전체화면 토글 함수
+  const handleFullscreenToggle = () => {
+    const element = document.getElementById('unity-game-wrapper');
+    if (!element) return;
 
-    // 🚀 유니티 점수 전송 연동 안테나 (유니티 내부에 입력된 이름 그대로 가져옴)
+    if (!isMobileFS) {
+      if (element.requestFullscreen) element.requestFullscreen();
+      else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen(); // 아이폰/사파리 브라우저 대응
+      setIsMobileFS(true);
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      setIsMobileFS(false);
+    }
+  };
+
+  // 🚀 [★기능 추가] 5초마다 자동으로 백엔드 장부를 체크하는 백그라운드 타이머 효과
+  useEffect(() => {
+    fetchLeaderboard(); // 앱이 켜질 때 최초 1회 즉시 로드
+
+    const autoRefreshTimer = setInterval(() => {
+      fetchLeaderboard();
+      console.log('🔄 [자동 갱신] 리더보드 데이터를 백엔드와 동기화했습니다 (5초 주기)');
+    }, 5000);
+
+    // [클린업] 유저가 창을 닫거나 컴포넌트가 사라질 때 메모리 누수를 막기 위해 타이머 자동 폭파
+    return () => clearInterval(autoRefreshTimer);
+  }, []);
+
+  // 전체화면 상태 동기화 및 유니티 안테나 설정
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      setIsMobileFS(isFS);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+    // 유니티 엔진 전용 수신 기지
     window.SendScoreToReact = function (param1, param2) {
       let finalName = 'Guest';
       let finalScore = 0;
@@ -50,7 +85,7 @@ function App() {
         }
       }
 
-      console.log(`📡 [점수 수신] 이름: ${finalName} | 점수: ${finalScore} -> 서버 전송`);
+      console.log(`📡 [점수 수신] 이름: ${finalName} | 점수: ${finalScore} -> 백엔드 전송 완료`);
 
       fetch('/api/leaderboard', {
         method: 'POST',
@@ -60,15 +95,20 @@ function App() {
         .then((res) => res.json())
         .then((data) => {
           console.log('✅ 랭킹 등록 성공:', data);
-          fetchLeaderboard();
+          fetchLeaderboard(); // 점수가 들어오면 타이머 상관없이 즉시 1회 새로고침
         })
         .catch((err) => console.error('❌ 랭킹 전송 실패:', err));
+    };
+
+    return () => {
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
     };
   }, []);
 
   return (
     <div className="app-container">
-      {/* 상단 헤더 */}
+      {/* 상단 네온 헤더 */}
       <header className="app-header">
         <h1 className="app-logo">EXPRESS GAME</h1>
         <div className="server-status">
@@ -76,7 +116,7 @@ function App() {
         </div>
       </header>
 
-      {/* 메인 콘텐츠 */}
+      {/* 메인 콘텐츠 구조 (위아래 세로 배치) */}
       <main className="main-content">
         
         {/* 🎮 1층: 플레이 존 판넬 */}
@@ -84,18 +124,20 @@ function App() {
           <div className="panel-header">
             <h2 className="panel-title">🎮 PLAY ZONE</h2>
             <div className="controls-group">
-              {/* 📱 모바일 화면 전환 버튼 */}
               <button 
                 className="btn btn-primary mobile-fs-btn"
-                onClick={() => setIsMobileFS(!isMobileFS)}
+                onClick={handleFullscreenToggle}
               >
                 {isMobileFS ? "✕ 화면 축소" : "📱 모바일 전체화면"}
               </button>
             </div>
           </div>
 
-          {/* 유니티 게임 배치 상자 */}
-          <div className={`game-wrapper ${isMobileFS ? 'mobile-fullscreen' : ''}`}>
+          {/* 유니티 게임 액자 상자 */}
+          <div 
+            id="unity-game-wrapper"
+            className={`game-wrapper ${isMobileFS ? 'mobile-fullscreen' : ''}`}
+          >
             <iframe 
               src="/game/index.html" 
               title="Unity Game" 
@@ -106,12 +148,12 @@ function App() {
           </div>
         </section>
 
-        {/* 🏆 2층: 리더보드 판넬 */}
+        {/* 🏆 2층: 리더보드 랭킹 판넬 (5초 자동 업그레이드 엔진 탑재) */}
         <section className="glass-panel">
           <div className="panel-header">
-            <h2 className="panel-title">🏆 LEADERBOARD</h2>
+            <h2 className="panel-title">🏆 LEADERBOARD <span style={{ fontSize: '0.8rem', color: '#06b6d4', marginLeft: '8px' }}>(5s Auto)</span></h2>
             <div className="btn-group">
-              <button className="btn btn-primary" onClick={fetchLeaderboard}>🔄 갱신</button>
+              <button className="btn btn-primary" onClick={fetchLeaderboard}>🔄 수동 갱신</button>
               <button className="btn btn-secondary" onClick={handleReset}>🗑️ 초기화</button>
             </div>
           </div>

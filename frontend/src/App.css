@@ -57,7 +57,7 @@ body {
   box-shadow: 0 0 8px #10b981;
 }
 
-/* 메인 콘텐츠 세로 정렬 설계도 */
+/* 메인 콘텐츠 배치 */
 .main-content {
   display: flex;
   flex-direction: column; 
@@ -104,7 +104,7 @@ body {
   gap: 15px;
 }
 
-/* 🎮 유니티 액자 상자 */
+/* 🎮 유니티 기본 정적 액자 상자 */
 .game-wrapper {
   width: 100%;
   overflow: hidden;
@@ -115,7 +115,7 @@ body {
   align-items: center;
 }
 
-/* 🎮 PC 최적화 종횡비 */
+/* 🎮 PC 최적화 규격 비율 */
 .game-canvas {
   width: 100%;
   height: auto;
@@ -125,7 +125,7 @@ body {
   overflow: hidden;
 }
 
-/* 버튼 스타일 마스터 */
+/* 버튼 마스터 셋팅 */
 .btn-group { display: flex; gap: 10px; }
 .btn {
   padding: 8px 16px;
@@ -141,10 +141,10 @@ body {
 .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #d1d5db; }
 .btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
 
-/* 모바일 전용 전체화면 스위치 기본 숨김 */
+/* 모바일 전용 스위치 기본 숨김 */
 .mobile-fs-btn { display: none; }
 
-/* 🏆 리더보드 데이터 */
+/* 🏆 리더보드 데이터 스타일 */
 .table-container { width: 100%; overflow-x: auto; }
 .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
 .leaderboard-table th, .leaderboard-table td {
@@ -159,34 +159,53 @@ body {
 .rank-2 { color: #9ca3af; font-weight: 800; text-align: center; }
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
 
-/* 🚀📱 스마트폰 가로대응 하이엔드 반응형 쿼리 패치 */
+
+/* 🚀📱 [★대개조] 스마트폰 가로 강제 회전 & 자동 여백 연산 미디어 쿼리 */
 @media (max-width: 768px) {
   .app-header { padding: 15px; }
   .main-content { padding: 0 10px 40px 10px; gap: 15px; }
   .glass-panel { padding: 16px; }
-  .mobile-fs-btn { display: inline-block; } 
+  .mobile-fs-btn { display: inline-block; } /* 모바일에서만 전체화면 버튼 노출 */
 
-  /* 📱 모바일 전체화면 레이어 마운트 */
-  .game-wrapper.mobile-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 999999;
-    border-radius: 0;
-    background: #000000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  /* ❶ 스마트폰을 여전히 [세로]로 들고 있을 때 버튼을 누른 경우 -> 게임만 90도 강제 회전 */
+  @media (orientation: portrait) {
+    .game-wrapper.mobile-fullscreen {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      width: 100vh;  /* 가로세로 축을 뒤바꿔 화면에 가득 채움 */
+      height: 100vw; 
+      transform: translate(-50%, -50%) rotate(90deg); /* 90도 회전 매직 */
+      z-index: 999999 !important;
+      border-radius: 0;
+      background: #000000;
+    }
+    .game-wrapper.mobile-fullscreen .game-canvas {
+      width: 100vh;
+      height: 100vw;
+      max-width: calc(100vw * 16 / 10.4); /* 게임이 찢어지거나 짤리지 않게 비율 자동 고정 */
+      aspect-ratio: auto;
+    }
   }
 
-  /* 💡 [★핵심 기능] 가로 상태 최대화 및 자동 종횡비 제한 연산 기술 도입 */
-  .game-wrapper.mobile-fullscreen .game-canvas {
-    width: 100vw;
-    height: calc(100vw * 10.4 / 16);
-    max-height: 100vh;                  /* 스마트폰 가로 높이를 절대 넘어가지 않음 = 위아래 짤림 전면 방어 */
-    max-width: calc(100vh * 16 / 10.4);  /* 가로로 늘어날 때 좌우 잘림 방어 */
-    aspect-ratio: auto;
+  /* ❷ 스마트폰을 물리적으로 [가로]로 돌려서 누른 경우 -> 회전 없이 풀스크린 매칭 */
+  @media (orientation: landscape) {
+    .game-wrapper.mobile-fullscreen {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw;
+      height: 100vh;
+      transform: none !important; /* 가로 상태이므로 회전 해제 */
+      z-index: 999999 !important;
+      border-radius: 0;
+      background: #000000;
+    }
+    .game-wrapper.mobile-fullscreen .game-canvas {
+      width: 100vw;
+      height: 100vh;
+      max-width: calc(100vh * 16 / 10.4); /* 상하좌우 자동 짤림 방어 마감연산 */
+      aspect-ratio: auto;
+    }
   }
 }
