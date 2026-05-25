@@ -57,7 +57,7 @@ body {
   box-shadow: 0 0 8px #10b981;
 }
 
-/* 🚀 [세로 배치 설계도 반영] 메인 레이아웃 구도 변경 */
+/* 메인 콘텐츠 세로 정렬 설계도 */
 .main-content {
   display: flex;
   flex-direction: column; 
@@ -68,7 +68,7 @@ body {
   box-sizing: border-box;
 }
 
-/* 글래스모피즘 판넬 스타일 (가로폭 100% 전면 확장) */
+/* 글래스모피즘 판넬 */
 .glass-panel {
   width: 100%;
   background: rgba(17, 24, 39, 0.7);
@@ -102,40 +102,9 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  flex-wrap: wrap;
 }
 
-/* ⌨️ 리액트 모바일 우회 입력창 디자인 */
-.react-input-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.react-input-box label {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  font-weight: 600;
-}
-
-.react-input-box input {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 6px 10px;
-  color: #fff;
-  font-size: 0.9rem;
-  width: 110px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.react-input-box input:focus {
-  border-color: #06b6d4;
-  box-shadow: 0 0 5px rgba(6, 182, 212, 0.4);
-}
-
-/* 🎮 유니티 액자 껍데기 박스 */
+/* 🎮 유니티 액자 상자 */
 .game-wrapper {
   width: 100%;
   overflow: hidden;
@@ -146,17 +115,17 @@ body {
   align-items: center;
 }
 
-/* 🎮 [반응형 종횡비] PC 및 일반 디스플레이 브라우저 화면 매칭 */
+/* 🎮 PC 최적화 종횡비 */
 .game-canvas {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 10.4; /* 하단 유니티 바까지 완전 수용 공학 비율 */
+  aspect-ratio: 16 / 10.4; 
   border: none;
   display: block;
   overflow: hidden;
 }
 
-/* 버튼 마스터 아키텍처 */
+/* 버튼 스타일 마스터 */
 .btn-group { display: flex; gap: 10px; }
 .btn {
   padding: 8px 16px;
@@ -175,7 +144,7 @@ body {
 /* 모바일 전용 전체화면 스위치 기본 숨김 */
 .mobile-fs-btn { display: none; }
 
-/* 🏆 리더보드 데이터 정렬 */
+/* 🏆 리더보드 데이터 */
 .table-container { width: 100%; overflow-x: auto; }
 .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
 .leaderboard-table th, .leaderboard-table td {
@@ -190,14 +159,14 @@ body {
 .rank-2 { color: #9ca3af; font-weight: 800; text-align: center; }
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
 
-/* 🚀📱 [★대개조] 스마트폰/태블릿 반응형 미디어 쿼리 패치 */
+/* 🚀📱 스마트폰 가로대응 하이엔드 반응형 쿼리 패치 */
 @media (max-width: 768px) {
   .app-header { padding: 15px; }
   .main-content { padding: 0 10px 40px 10px; gap: 15px; }
   .glass-panel { padding: 16px; }
-  .mobile-fs-btn { display: inline-block; } /* 모바일에서 전체화면 스위치 온 */
+  .mobile-fs-btn { display: inline-block; } 
 
-  /* 📱 전체화면 활성화 시 뷰포트 강제 잠금 및 오버레이 터치 가동 */
+  /* 📱 모바일 전체화면 레이어 마운트 */
   .game-wrapper.mobile-fullscreen {
     position: fixed;
     top: 0;
@@ -207,11 +176,17 @@ body {
     z-index: 999999;
     border-radius: 0;
     background: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
+  /* 💡 [★핵심 기능] 가로 상태 최대화 및 자동 종횡비 제한 연산 기술 도입 */
   .game-wrapper.mobile-fullscreen .game-canvas {
     width: 100vw;
-    height: 100vh;
-    aspect-ratio: auto; /* 고정 비율 잠금 해제하여 모바일 폰 스크린에 꽉 채움 */
+    height: calc(100vw * 10.4 / 16);
+    max-height: 100vh;                  /* 스마트폰 가로 높이를 절대 넘어가지 않음 = 위아래 짤림 전면 방어 */
+    max-width: calc(100vh * 16 / 10.4);  /* 가로로 늘어날 때 좌우 잘림 방어 */
+    aspect-ratio: auto;
   }
 }

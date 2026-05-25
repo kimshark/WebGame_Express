@@ -1,16 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css'; // 🚀 [★범인 검거] 제 실수로 빠졌던 스타일 연결선을 다시 든든하게 연결했습니다!
+import React, { useState, useEffect } from 'react';
+import './App.css'; 
 
 function App() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [isMobileFS, setIsMobileFS] = useState(false);
-  const [reactPlayerName, setReactPlayerName] = useState('모바일랭커');
-  
-  const nameRef = useRef(reactPlayerName);
-
-  useEffect(() => {
-    nameRef.current = reactPlayerName;
-  }, [reactPlayerName]);
 
   // 1. 실시간 랭킹 가져오기
   const fetchLeaderboard = () => {
@@ -41,18 +34,23 @@ function App() {
   useEffect(() => {
     fetchLeaderboard();
 
-    // 유니티 점수 수신 안테나
+    // 🚀 유니티 점수 전송 연동 안테나 (유니티 내부에 입력된 이름 그대로 가져옴)
     window.SendScoreToReact = function (param1, param2) {
-      let finalName = nameRef.current || '무명랭커';
+      let finalName = 'Guest';
       let finalScore = 0;
 
       if (param2 !== undefined) {
+        finalName = String(param1);
         finalScore = Number(param2);
       } else {
-        finalScore = Number(param1);
+        if (isNaN(param1)) {
+          finalName = String(param1);
+        } else {
+          finalScore = Number(param1);
+        }
       }
 
-      console.log(`📡 [모바일 패치] 이름: ${finalName} | 점수: ${finalScore} -> 서버 전송`);
+      console.log(`📡 [점수 수신] 이름: ${finalName} | 점수: ${finalScore} -> 서버 전송`);
 
       fetch('/api/leaderboard', {
         method: 'POST',
@@ -86,20 +84,7 @@ function App() {
           <div className="panel-header">
             <h2 className="panel-title">🎮 PLAY ZONE</h2>
             <div className="controls-group">
-              
-              {/* 모바일 우회 입력창 */}
-              <div className="react-input-box">
-                <label>📝 랭킹 등록 이름 :</label>
-                <input 
-                  type="text" 
-                  value={reactPlayerName}
-                  onChange={(e) => setReactPlayerName(e.target.value)}
-                  maxLength={10}
-                  placeholder="이름 입력"
-                />
-              </div>
-
-              {/* 모바일 화면 전환 버튼 */}
+              {/* 📱 모바일 화면 전환 버튼 */}
               <button 
                 className="btn btn-primary mobile-fs-btn"
                 onClick={() => setIsMobileFS(!isMobileFS)}
