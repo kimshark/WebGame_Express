@@ -30,7 +30,7 @@ body {
 }
 
 .app-logo {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: 2px;
   background: linear-gradient(45deg, #4f46e5, #06b6d4);
@@ -39,18 +39,36 @@ body {
   margin: 0;
 }
 
-/* 🚀 [설계도 반영] 메인 콘텐츠: 위아래 일렬 세로 정렬 */
+.server-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* 🚀 [세로 배치 설계도 반영] 메인 레이아웃 구도 변경 */
 .main-content {
   display: flex;
   flex-direction: column; 
-  gap: 30px;
+  gap: 25px;
   width: 100%;
-  max-width: 1000px; /* 대시보드가 가장 예쁘게 잡히는 너비 */
-  padding: 0 20px 60px 20px;
+  max-width: 1000px;
+  padding: 0 20px 50px 20px;
   box-sizing: border-box;
 }
 
-/* 네온 글래스모피즘 판넬 (가로 100% 채우기) */
+/* 글래스모피즘 판넬 스타일 (가로폭 100% 전면 확장) */
 .glass-panel {
   width: 100%;
   background: rgba(17, 24, 39, 0.7);
@@ -68,20 +86,59 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .panel-title {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 1px;
   color: #e5e7eb;
   margin: 0;
 }
 
-/* 🎮 유니티 게임 감싸는 상자 */
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* ⌨️ 리액트 모바일 우회 입력창 디자인 */
+.react-input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.react-input-box label {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.react-input-box input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  width: 110px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.react-input-box input:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 5px rgba(6, 182, 212, 0.4);
+}
+
+/* 🎮 유니티 액자 껍데기 박스 */
 .game-wrapper {
   width: 100%;
-  overflow: hidden; /* 내부 스크롤바 절대 탈출 불가 */
+  overflow: hidden;
   border-radius: 12px;
   background: #000000;
   display: flex;
@@ -89,25 +146,18 @@ body {
   align-items: center;
 }
 
-/* 🎮 [★핵심 수정] 유니티 iframe 틀 조정 */
+/* 🎮 [반응형 종횡비] PC 및 일반 디스플레이 브라우저 화면 매칭 */
 .game-canvas {
-  width: 100%;       /* 부모 판넬 가로 크기에 무조건 100% 맞춤 */
-  height: auto;      /* 높이는 고정하지 않고 아래 aspect-ratio에 맡김 */
-  
-  /* 💡 유니티 기본 16:10 비율에 하단 툴바 공간을 유연하게 더한 마법의 마스터 비율 */
-  aspect-ratio: 16 / 10.6; 
-  
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10.4; /* 하단 유니티 바까지 완전 수용 공학 비율 */
   border: none;
   display: block;
-  overflow: hidden;  /* 브라우저 강제 스크롤바 완전 방지 */
+  overflow: hidden;
 }
 
-/* 🏆 리더보드 영역 (아래쪽 배치용) */
-.btn-group {
-  display: flex;
-  gap: 10px;
-}
-
+/* 버튼 마스터 아키텍처 */
+.btn-group { display: flex; gap: 10px; }
 .btn {
   padding: 8px 16px;
   font-size: 0.9rem;
@@ -117,47 +167,51 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .btn-primary { background: #4f46e5; color: #ffffff; }
 .btn-primary:hover { background: #4338ca; }
 .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #d1d5db; }
 .btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
 
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-}
+/* 모바일 전용 전체화면 스위치 기본 숨김 */
+.mobile-fs-btn { display: none; }
 
-.leaderboard-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.leaderboard-table th, 
-.leaderboard-table td {
+/* 🏆 리더보드 데이터 정렬 */
+.table-container { width: 100%; overflow-x: auto; }
+.leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
+.leaderboard-table th, .leaderboard-table td {
   padding: 14px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-
-.leaderboard-table th {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  text-transform: uppercase;
-}
-
-.score-text {
-  text-align: right;
-  font-weight: 700;
-  color: #06b6d4;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 50px 0;
-  color: #6b7280;
-}
+.leaderboard-table th { font-size: 0.85rem; color: #9ca3af; text-transform: uppercase; }
+.score-text { text-align: right; font-weight: 700; color: #06b6d4; }
+.empty-state { text-align: center; padding: 40px 0; color: #6b7280; }
 
 .rank-1 { color: #f59e0b; font-weight: 800; text-align: center; }
 .rank-2 { color: #9ca3af; font-weight: 800; text-align: center; }
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
+
+/* 🚀📱 [★대개조] 스마트폰/태블릿 반응형 미디어 쿼리 패치 */
+@media (max-width: 768px) {
+  .app-header { padding: 15px; }
+  .main-content { padding: 0 10px 40px 10px; gap: 15px; }
+  .glass-panel { padding: 16px; }
+  .mobile-fs-btn { display: inline-block; } /* 모바일에서 전체화면 스위치 온 */
+
+  /* 📱 전체화면 활성화 시 뷰포트 강제 잠금 및 오버레이 터치 가동 */
+  .game-wrapper.mobile-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    border-radius: 0;
+    background: #000000;
+  }
+
+  .game-wrapper.mobile-fullscreen .game-canvas {
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto; /* 고정 비율 잠금 해제하여 모바일 폰 스크린에 꽉 채움 */
+  }
+}

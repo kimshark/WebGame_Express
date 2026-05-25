@@ -1,106 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React, { useState, useEffect, useRef } from 'react';
 
 function App() {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isMobileFS, setIsMobileFS] = useState(false);
+  // ⌨️ 모바일 키보드 해결을 위한 리액트 이름 상태 (기본값: 모바일랭커)
+  const [reactPlayerName, setReactPlayerName] = useState('모바일랭커');
+  
+  // 유니티 전역 함수가 리액트의 최신 이름 상태를 실시간으로 참조할 수 있도록 Ref 사용
+  const nameRef = useRef(reactPlayerName);
 
-  // 랭킹 불러오기 함수
-  const fetchLeaderboard = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/leaderboard');
-      const data = await response.json();
-      setLeaderboard(data);
-    } catch (error) {
-      console.error("랭킹 로드 실패:", error);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    nameRef.current = reactPlayerName;
+  }, [reactPlayerName]);
+
+  // 1. 실시간 랭킹 가져오기
+  const fetchLeaderboard = () => {
+    fetch('/api/leaderboard')
+      .then((res) => res.json())
+      .then((data) => setLeaderboard(data))
+      .catch((err) => console.error('❌ 랭킹 로딩 실패:', err));
+  };
+
+  // 2. 관리자용 리더보드 초기화
+  const handleReset = () => {
+    const password = prompt('🔑 초기화 비밀번호를 입력하세요:');
+    if (!password) return;
+
+    fetch('/api/leaderboard/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(data.message);
+        fetchLeaderboard();
+      })
+      .catch((err) => console.error('❌ 초기화 실패:', err));
   };
 
   useEffect(() => {
     fetchLeaderboard();
-  }, []);
 
-  // 관리자용 초기화 함수
-  const handleReset = async () => {
-    const password = prompt("관리자 비밀번호를 입력하세요:");
-    if (!password) return;
+    // 🚀 [★핵심 패치] 유니티가 점수를 보낼 때, 리액트 입력창의 이름을 가로채서 서버로 전송
+    window.SendScoreToReact = function (param1, param2) {
+      let finalName = nameRef.current || '무명랭커';
+      let finalScore = 0;
 
-    try {
-      const response = await fetch('/api/leaderboard/reset', {
+      // 인자 값 판별 (유니티 빌드 구조에 맞춤)
+      if (param2 !== undefined) {
+        finalScore = Number(param2);
+      } else {
+        finalScore = Number(param1);
+      }
+
+      console.log(`📡 [모바일 패치 가동] 이름: ${finalName} | 점수: ${finalScore} -> 서버 전송 시작`);
+
+      fetch('/api/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert(data.message);
-        fetchLeaderboard();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert("초기화 중 오류가 발생했습니다.");
-    }
-  };
+        body: JSON.stringify({ name: finalName, score: finalScore })
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('✅ 랭킹 등록 성공:', data);
+          fetchLeaderboard(); // 등록 후 리더보드 즉시 새로고침
+        })
+        .catch((err) => console.error('❌ 랭킹 전송 실패:', err));
+    };
+  }, []);
 
   return (
     <div className="app-container">
-      {/* 🚀 상단 헤더 영역 */}
+      {/* 상단 헤더 */}
       <header className="app-header">
         <h1 className="app-logo">EXPRESS GAME</h1>
-        <span className="btn btn-secondary" style={{ cursor: 'default', fontSize: '0.8rem' }}>
-          🟢 SERVER LIVE
-        </span>
+        <div className="server-status">
+          <span className="status-dot"></span>SERVER LIVE
+        </div>
       </header>
 
-      {/* 🎮 메인 콘텐츠 반응형 그리드 */}
+      {/* 메인 콘텐츠 (위아래 세로 직렬 배치) */}
       <main className="main-content">
         
-        {/* 왼쪽 섹션: 유니티 웹뷰 포트 */}
+        {/* 🎮 1층: 플레이 존 판넬 */}
         <section className="glass-panel">
           <div className="panel-header">
             <h2 className="panel-title">🎮 PLAY ZONE</h2>
+            <div className="controls-group">
+              
+              {/* ⌨️ 모바일 전용 이름 입력창 (터치 시 키보드가 무조건 정상 작동합니다) */}
+              <div className="react-input-box">
+                <label>📝 랭킹 등록 이름 :</label>
+                <input 
+                  type="text" 
+                  value={reactPlayerName}
+                  onChange={(e) => setReactPlayerName(e.target.value)}
+                  maxLength={10}
+                  placeholder="이름 입력"
+                />
+              </div>
+
+              {/* 📱 모바일 화면 전환 버튼 */}
+              <button 
+                className="btn btn-primary mobile-fs-btn"
+                onClick={() => setIsMobileFS(!isMobileFS)}
+              >
+                {isMobileFS ? "✕ 화면 축소" : "📱 모바일 전체화면"}
+              </button>
+            </div>
           </div>
-          <div className="game-wrapper">
-            {/* 💡 유니티 게임 파일들이 위치한 /game/index.html 주소로 정확히 지정했습니다. */}
+
+          {/* 유니티 게임 배치 상자 */}
+          <div className={`game-wrapper ${isMobileFS ? 'mobile-fullscreen' : ''}`}>
             <iframe 
-              src="/game/index.html"  // 👈 기존 '/game/index.html'에서 'MyGameBuild'로 변경!
+              src="/game/index.html" 
               title="Unity Game" 
               className="game-canvas"
               allow="autoplay; fullscreen"
-              scrolling="no" /* 👈 웹브라우저에게 스크롤바를 절대 만들지 말라고 쐐기를 박는 속성 */
+              scrolling="no"
             />
           </div>
         </section>
 
-        {/* 오른쪽 섹션: 실시간 리더보드 */}
+        {/* 🏆 2층: 리더보드 판넬 (가로로 꽉 차게 확장) */}
         <section className="glass-panel">
           <div className="panel-header">
             <h2 className="panel-title">🏆 LEADERBOARD</h2>
             <div className="btn-group">
-              <button onClick={fetchLeaderboard} className="btn btn-primary" disabled={loading}>
-                {loading ? "로딩..." : "🔄 갱신"}
-              </button>
-              <button onClick={handleReset} className="btn btn-secondary">
-                🗑️ 초기화
-              </button>
+              <button className="btn btn-primary" onClick={fetchLeaderboard}>🔄 갱신</button>
+              <button className="btn btn-secondary" onClick={handleReset}>🗑️ 초기화</button>
             </div>
           </div>
 
           <div className="table-container">
             {leaderboard.length === 0 ? (
-              <div className="empty-state">
-                <p>아직 등록된 기록이 없습니다.</p>
-                <p style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>첫 번째 랭커가 되어보세요!</p>
-              </div>
+              <p className="empty-state">아직 등록된 기록이 없습니다.<br />첫 번째 랭커가 되어보세요!</p>
             ) : (
               <table className="leaderboard-table">
                 <thead>
                   <tr>
-                    <th style={{ textAlign: 'center' }}>순위</th>
+                    <th style={{ width: '80px', textAlign: 'center' }}>순위</th>
                     <th>플레이어 ID</th>
                     <th style={{ textAlign: 'right' }}>점수 (PTS)</th>
                   </tr>
@@ -108,14 +148,14 @@ function App() {
                 <tbody>
                   {leaderboard.map((player, index) => {
                     const rank = index + 1;
-                    let rankClass = "";
-                    if (rank === 1) rankClass = "rank-1";
-                    else if (rank === 2) rankClass = "rank-2";
-                    else if (rank === 3) rankClass = "rank-3";
+                    let rankClass = '';
+                    if (rank === 1) rankClass = 'rank-1';
+                    else if (rank === 2) rankClass = 'rank-2';
+                    else if (rank === 3) rankClass = 'rank-3';
 
                     return (
                       <tr key={index}>
-                        <td className={rankClass}>{rank}</td>
+                        <td className={rankClass}>{rank}위</td>
                         <td style={{ fontWeight: '500' }}>{player.name}</td>
                         <td className="score-text">{player.score.toLocaleString()}</td>
                       </tr>
