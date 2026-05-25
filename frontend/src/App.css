@@ -104,7 +104,7 @@ body {
   gap: 15px;
 }
 
-/* 🎮 유니티 기본 정적 액자 상자 */
+/* 🎮 유니티 기본 정적 액자 상자 (PC) */
 .game-wrapper {
   width: 100%;
   overflow: hidden;
@@ -119,7 +119,7 @@ body {
 .game-canvas {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 10.4; 
+  aspect-ratio: 16 / 10.4; /* 유니티 원본 비율 + 하단바 수용 */
   border: none;
   display: block;
   overflow: hidden;
@@ -160,31 +160,40 @@ body {
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
 
 
-/* 🚀📱 [★대개조] 스마트폰 가로 강제 회전 & 자동 여백 연산 미디어 쿼리 */
+/* 🚀📱 [★100% 짤림 방지] 모바일 가로 강제 전체화면 스마트 반응형 쿼리 */
 @media (max-width: 768px) {
   .app-header { padding: 15px; }
   .main-content { padding: 0 10px 40px 10px; gap: 15px; }
   .glass-panel { padding: 16px; }
-  .mobile-fs-btn { display: inline-block; } /* 모바일에서만 전체화면 버튼 노출 */
+  .mobile-fs-btn { display: inline-block; } 
 
-  /* ❶ 스마트폰을 여전히 [세로]로 들고 있을 때 버튼을 누른 경우 -> 게임만 90도 강제 회전 */
+  /* ❶ 스마트폰을 [세로]로 들고 있을 때 버튼을 누른 경우 -> 게임만 90도 강제 회전 */
   @media (orientation: portrait) {
     .game-wrapper.mobile-fullscreen {
       position: fixed !important;
       top: 50% !important;
       left: 50% !important;
-      width: 100vh;  /* 가로세로 축을 뒤바꿔 화면에 가득 채움 */
+      /* 💡 부모 컨테이너는 화면을 꽉 채우되, 축을 뒤바꿈 */
+      width: 100vh; 
       height: 100vw; 
-      transform: translate(-50%, -50%) rotate(90deg); /* 90도 회전 매직 */
+      transform: translate(-50%, -50%) rotate(90deg); 
       z-index: 999999 !important;
       border-radius: 0;
       background: #000000;
+      /* 내부 게임 화면을 정중앙 정렬 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .game-wrapper.mobile-fullscreen .game-canvas {
-      width: 100vh;
-      height: 100vw;
-      max-width: calc(100vw * 16 / 10.4); /* 게임이 찢어지거나 짤리지 않게 비율 자동 고정 */
-      aspect-ratio: auto;
+      /* 🚀 [★핵심 수정] 강제 크기 지정(100vw/vh)을 버리고, 원본 비율을 사수하면서 화면 안에 가둠 */
+      width: auto;
+      height: auto;
+      aspect-ratio: 16 / 10.4;  /* 게임의 원본 절대 비율 */
+      
+      /* 💡 화면 크기에 맞게 자동 연산 (짤림 방지 치트키) */
+      max-width: 100%;         /* 부모(100vh)를 넘지 않음 = 좌우 짤림 방지 */
+      max-height: 100%;        /* 부모(100vw)를 넘지 않음 = 위아래 짤림 방지 */
     }
   }
 
@@ -196,16 +205,24 @@ body {
       left: 0 !important;
       width: 100vw;
       height: 100vh;
-      transform: none !important; /* 가로 상태이므로 회전 해제 */
+      transform: none !important;
       z-index: 999999 !important;
       border-radius: 0;
       background: #000000;
+      /* 내부 정중앙 정렬 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .game-wrapper.mobile-fullscreen .game-canvas {
-      width: 100vw;
-      height: 100vh;
-      max-width: calc(100vh * 16 / 10.4); /* 상하좌우 자동 짤림 방어 마감연산 */
-      aspect-ratio: auto;
+      /* 🚀 [★핵심 수정] 원본 비율 사수하며 화면 안에 가둠 */
+      width: auto;
+      height: auto;
+      aspect-ratio: 16 / 10.4;
+      
+      /* 💡 짤림 방지 자동 연산 */
+      max-width: 100%;         /* 화면 너비를 넘지 않음 */
+      max-height: 100%;        /* 화면 높이를 넘지 않음 */
     }
   }
 }
