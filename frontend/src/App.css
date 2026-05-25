@@ -39,18 +39,18 @@ body {
   margin: 0;
 }
 
-/* 🚀 [디자인 핵심] 메인 콘텐츠 영역: 가로 정렬에서 세로(Column) 정렬로 완전히 변경 */
+/* 🚀 [설계도 반영] 메인 콘텐츠: 위아래 일렬 세로 정렬 */
 .main-content {
   display: flex;
   flex-direction: column; 
-  gap: 25px;
+  gap: 30px;
   width: 100%;
-  max-width: 1000px; /* 화면이 너무 퍼지지 않게 잡아주는 최적의 대시보드 너비 */
-  padding: 0 20px 50px 20px;
+  max-width: 1000px; /* 대시보드가 가장 예쁘게 잡히는 너비 */
+  padding: 0 20px 60px 20px;
   box-sizing: border-box;
 }
 
-/* 네온 클래스모피즘 판넬 (위아래 둘 다 가로 100% 채우기) */
+/* 네온 글래스모피즘 판넬 (가로 100% 채우기) */
 .glass-panel {
   width: 100%;
   background: rgba(17, 24, 39, 0.7);
@@ -78,28 +78,28 @@ body {
   margin: 0;
 }
 
-/* 🎮 유니티 게임 감싸는 상자 (스크롤 바 완전 박멸 존) */
+/* 🎮 유니티 게임 감싸는 상자 */
 .game-wrapper {
   width: 100%;
-  overflow: hidden; /* 내부 스크롤바가 튀어나오는 것을 방지 */
+  overflow: hidden; /* 내부 스크롤바 탈출 원천 차단 */
   border-radius: 12px;
   background: #000000;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* 🎮 유니티 iframe 자체 스타일 지동 제어 */
+/* 🎮 [★핵심 수정] 유니티 iframe 틀 조정 */
 .game-canvas {
   width: 100%;
-  height: 620px; /* 유니티 WebGL 기본 해상도가 깨지거나 찌그러지지 않는 가장 완벽한 고정 높이 */
+  max-width: 960px;  /* 유니티 기본 가로 해상도 */
+  height: 645px;     /* 유니티 해상도(600px) + 하단 툴바(45px)까지 여유 있게 안 잘리도록 조정 */
   border: none;
   display: block;
-  overflow: hidden; /* 브라우저 강제 스크롤바 히든 */
+  overflow: hidden;  /* 브라우저 강제 스크롤바 방지 */
 }
 
-/* 🏆 리더보드 테이블 디자인 정비 (가로 꽉 차게) */
+/* 🏆 리더보드 영역 (아래쪽 배치용) */
 .btn-group {
   display: flex;
   gap: 10px;
@@ -113,21 +113,11 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.btn-primary {
-  background: #4f46e5;
-  color: #ffffff;
-}
+.btn-primary { background: #4f46e5; color: #ffffff; }
 .btn-primary:hover { background: #4338ca; }
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #d1d5db;
-}
+.btn-secondary { background: rgba(255, 255, 255, 0.1); color: #d1d5db; }
 .btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
 
 .table-container {
@@ -149,9 +139,8 @@ body {
 
 .leaderboard-table th {
   font-size: 0.85rem;
-  text-transform: uppercase;
   color: #9ca3af;
-  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .score-text {
@@ -162,11 +151,10 @@ body {
 
 .empty-state {
   text-align: center;
-  padding: 40px 0;
+  padding: 50px 0;
   color: #6b7280;
 }
 
-/* 순위별 명예의 전당 컬러 포인트 */
 .rank-1 { color: #f59e0b; font-weight: 800; text-align: center; }
 .rank-2 { color: #9ca3af; font-weight: 800; text-align: center; }
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
