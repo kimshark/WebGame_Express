@@ -96,3 +96,130 @@ body {
   letter-spacing: 1px;
   color: #e5e7eb;
   margin: 0;
+}
+
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 🎮 유니티 기본 정적 액자 상자 (PC 기본) */
+.game-wrapper {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🎮 PC 최적화 규격 비율 */
+.game-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10.4; 
+  border: none;
+  display: block;
+  overflow: hidden;
+}
+
+/* 버튼 마스터 셋팅 */
+.btn-group { display: flex; gap: 10px; }
+.btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-primary { background: #4f46e5; color: #ffffff; }
+.btn-primary:hover { background: #4338ca; }
+.btn-secondary { background: rgba(255, 255, 255, 0.1); color: #d1d5db; }
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* 모바일 전용 스위치 기본 숨김 */
+.mobile-fs-btn { display: none; }
+
+/* 🏆 리더보드 데이터 스타일 */
+.table-container { width: 100%; overflow-x: auto; }
+.leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
+.leaderboard-table th, .leaderboard-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.leaderboard-table th { font-size: 0.85rem; color: #9ca3af; text-transform: uppercase; }
+.score-text { text-align: right; font-weight: 700; color: #06b6d4; }
+.empty-state { text-align: center; padding: 40px 0; color: #6b7280; }
+
+.rank-1 { color: #f59e0b; font-weight: 800; text-align: center; }
+.rank-2 { color: #9ca3af; font-weight: 800; text-align: center; }
+.rank-3 { color: #b45309; font-weight: 800; text-align: center; }
+
+
+/* ========================================================================== */
+/* 🚀📱 [안정화 가드 설치] 모바일 가로/세로 전체화면 100% 매칭 스크립트 */
+/* ========================================================================== */
+
+/* 가로 해상도가 넓은 스마트폰까지 안전하게 품도록 범위를 1024px로 넉넉하게 지정 */
+@media (max-width: 1024px) {
+  .app-header { padding: 15px; }
+  .main-content { padding: 0 10px 40px 10px; gap: 15px; }
+  .glass-panel { padding: 16px; }
+  .mobile-fs-btn { display: inline-block !important; } /* 버튼 활성화 */
+
+  /* ❶ 스마트폰을 [세로]로 들고 있을 때 버튼을 누른 경우 -> 90도 회전 및 100% 꽉 채우기 */
+  @media (orientation: portrait) {
+    .game-wrapper.mobile-fullscreen {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      width: 100vh !important; 
+      height: 100vw !important; 
+      transform: translate(-50%, -50%) rotate(90deg) !important; 
+      z-index: 999999 !important;
+      border-radius: 0;
+      background: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .game-wrapper.mobile-fullscreen .game-canvas {
+      width: auto !important;
+      height: auto !important;
+      aspect-ratio: 16 / 10.4 !important;
+      /* 🚀 85%의 족쇄를 풀고 원래 비율 안에서 100% 가득 채우도록 변경 */
+      max-width: 100% !important;         
+      max-height: 100% !important;        
+    }
+  }
+
+  /* ❷ 스마트폰을 [가로]로 뉘어서 버튼을 누른 경우 -> 회전 없이 100% 스크린 꽉 채우기 */
+  @media (orientation: landscape) {
+    .game-wrapper.mobile-fullscreen {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      transform: none !important;
+      z-index: 999999 !important;
+      border-radius: 0;
+      background: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .game-wrapper.mobile-fullscreen .game-canvas {
+      width: auto !important;
+      height: auto !important;
+      aspect-ratio: 16 / 10.4 !important;
+      /* 🚀 가로 모드에서도 짤림 없이 100% 최고 크기로 대화면 팝업 */
+      max-width: 100% !important;         
+      max-height: 100% !important;        
+    }
+  }
+}
