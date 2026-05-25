@@ -119,7 +119,7 @@ body {
 .game-canvas {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 10.4; /* 유니티 원본 비율 + 하단바 수용 */
+  aspect-ratio: 16 / 10.4; 
   border: none;
   display: block;
   overflow: hidden;
@@ -160,7 +160,7 @@ body {
 .rank-3 { color: #b45309; font-weight: 800; text-align: center; }
 
 
-/* 🚀📱 [★100% 짤림 방지] 모바일 가로 강제 전체화면 스마트 반응형 쿼리 */
+/* 🚀📱 [★85% 안전구역 마스터 패치] 모바일 가로 강제 전체화면 스마트 반응형 쿼리 */
 @media (max-width: 768px) {
   .app-header { padding: 15px; }
   .main-content { padding: 0 10px 40px 10px; gap: 15px; }
@@ -173,27 +173,24 @@ body {
       position: fixed !important;
       top: 50% !important;
       left: 50% !important;
-      /* 💡 부모 컨테이너는 화면을 꽉 채우되, 축을 뒤바꿈 */
       width: 100vh; 
       height: 100vw; 
       transform: translate(-50%, -50%) rotate(90deg); 
       z-index: 999999 !important;
       border-radius: 0;
       background: #000000;
-      /* 내부 게임 화면을 정중앙 정렬 */
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .game-wrapper.mobile-fullscreen .game-canvas {
-      /* 🚀 [★핵심 수정] 강제 크기 지정(100vw/vh)을 버리고, 원본 비율을 사수하면서 화면 안에 가둠 */
       width: auto;
       height: auto;
-      aspect-ratio: 16 / 10.4;  /* 게임의 원본 절대 비율 */
+      aspect-ratio: 16 / 10.4;  
       
-      /* 💡 화면 크기에 맞게 자동 연산 (짤림 방지 치트키) */
-      max-width: 100%;         /* 부모(100vh)를 넘지 않음 = 좌우 짤림 방지 */
-      max-height: 100%;        /* 부모(100vw)를 넘지 않음 = 위아래 짤림 방지 */
+      /* 💡 [★대폭 수정] 풀스크린 크기의 정확히 85%로 축소하여 사방 여백 확보 (노치 짤림 원천 차단) */
+      max-width: 85%;         
+      max-height: 85%;        
     }
   }
 
@@ -209,20 +206,18 @@ body {
       z-index: 999999 !important;
       border-radius: 0;
       background: #000000;
-      /* 내부 정중앙 정렬 */
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .game-wrapper.mobile-fullscreen .game-canvas {
-      /* 🚀 [★핵심 수정] 원본 비율 사수하며 화면 안에 가둠 */
       width: auto;
       height: auto;
       aspect-ratio: 16 / 10.4;
       
-      /* 💡 짤림 방지 자동 연산 */
-      max-width: 100%;         /* 화면 너비를 넘지 않음 */
-      max-height: 100%;        /* 화면 높이를 넘지 않음 */
+      /* 💡 [★대폭 수정] 물리 가로 모드에서도 정확히 화면의 85% 크기로 안전하게 팝업 */
+      max-width: 85%;         
+      max-height: 85%;        
     }
   }
 }
