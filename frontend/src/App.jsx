@@ -67,7 +67,7 @@ function App() {
           <div className="game-wrapper">
             {/* 💡 유니티 게임 파일들이 위치한 /game/index.html 주소로 정확히 지정했습니다. */}
             <iframe 
-              src="/game/index.html" 
+              src="/MyGameBuild/index.html"  // 👈 기존 '/game/index.html'에서 'MyGameBuild'로 변경!
               title="Unity Game" 
               className="game-canvas"
               allow="autoplay; fullscreen"
