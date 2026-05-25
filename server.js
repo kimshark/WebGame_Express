@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 5000;
 
 // 2. 미들웨어 설정
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // 3. SQLite 데이터베이스 연결
 const dbPath = path.join(__dirname, 'database.sqlite');
